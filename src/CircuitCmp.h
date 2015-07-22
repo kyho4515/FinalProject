@@ -30,7 +30,7 @@ class CircuitCmp{
     vector<Var> outputXor;
     SatSolver solver;
     bool equivalence;
-	 //DepList* dep_list;
+	 DepList* dep_list;
 	
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
@@ -181,8 +181,8 @@ class CircuitCmp{
       	solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
       	bool result = solver.assumpSolve();
       	assert((equivalence && !result) || (!equivalence && result));
-			/*dep_list=new DepList(circuitOne->output,circuitTwo->output);
-			dep_list->Out();*/
+			dep_list=new DepList(circuitOne->output,circuitTwo->output);
+			dep_list->Out();
    		 }
 
     ~CircuitCmp(){
@@ -192,7 +192,7 @@ class CircuitCmp{
         delete _FECpair[i];
       for(int i=0; i < cutSet.size(); ++i)
         delete cutSet[i];
-      //delete dep_list;
+      delete dep_list;
     }
     bool Simulation(){
       cout << "Original circuitOne gate size :" << circuitOne -> dfsList.size() << endl
