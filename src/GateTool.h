@@ -6,8 +6,9 @@
 class VectorGateAdd{
 	public:
 		VectorGateAdd(vector<Gate*> in_list){list=in_list;}
-		VectorGateAdd(){}
+		VectorGateAdd(){};
 		VectorGateAdd operator+(VectorGateAdd);//operator overloading
+		~VectorGateAdd(){};
 		void operator=(VectorGateAdd);//operator overloading =
 		void PushBack(Gate*);//將Gate型態的pointer存入
 		int GetSize();//return vector<Gate*>output的size

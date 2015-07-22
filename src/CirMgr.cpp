@@ -231,6 +231,9 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
 		}
 	}
 // 7/14 //
+// 7/23 //
+	resetTraversed();
+// 7/23 //
 }
 
 

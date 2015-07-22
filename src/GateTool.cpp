@@ -58,3 +58,5 @@ vector<Gate*> VectorGateAdd::GetWholeOutput(){
 void VectorGateAdd::update(vector<Gate*> newdata){
 	list=newdata;
 }
+
+

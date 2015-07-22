@@ -5,6 +5,7 @@
 bool CircuitCmp::SimCheck(bool mode,vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
   RandGenerator rand;
   int count = 0;
+	
   while(true){
     for(int i=0; i < circuitOne -> input.size(); ++i){
       int tmp = rand.getRand();
@@ -80,66 +81,71 @@ void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
         cutSet[i] -> at(j) -> curSim = ~tmp;
     }
   }
+	
   circuitOne -> constTrueGate -> curSim = ~0;
   circuitOne -> constFalseGate -> curSim = 0;
   circuitTwo -> constTrueGate -> curSim = ~0;
   circuitTwo -> constFalseGate -> curSim = 0;
   HashMap<IntKey, Wire*> hash(circuitOne -> wire.size()+circuitTwo -> wire.size());
 
-  for(int i=0; i < _dfsListOne.size(); ++i){
-    _dfsListOne[i] -> operate();
-    if(_dfsListOne[i] -> gateType == Wir && !(((Wire*)_dfsListOne[i]) -> isCut())){
-      Wire* tmp;
-      if((_dfsListOne[i] -> curSim & MASK) == 0)
-        tmp = hash.insert(IntKey(~(_dfsListOne[i] -> curSim)), (Wire*)_dfsListOne[i]);
-      else
-        tmp = hash.insert(IntKey(_dfsListOne[i] -> curSim), (Wire*)_dfsListOne[i]);
-      if(tmp != NULL){
-        if(tmp -> traversed){
-          ((Wire*)_dfsListOne[i]) -> potentialCut = true;
-          _FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListOne[i]);
-        }
-        else{
-          tmp -> traversed = true;
-          tmp -> FECNum = _FECpair.size();
-          ((Wire*)_dfsListOne[i]) -> FECNum = _FECpair.size();
-          _FECpair.push_back(new vector<Wire*>);
-          ((Wire*)tmp) -> potentialCut = true;
-          ((Wire*)_dfsListOne[i]) -> potentialCut = true;
-          _FECpair[tmp -> FECNum] -> push_back(tmp);
-          _FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListOne[i]);
-        }
-      }
-    }
-  }
-   
-  for(int i=0; i < _dfsListTwo.size(); ++i){
-    _dfsListTwo[i] -> operate();
-    if(_dfsListTwo[i] -> gateType == Wir && !(((Wire*)_dfsListTwo[i]) -> isCut())){
-      Wire* tmp;
-      if((_dfsListTwo[i] -> curSim & MASK) == 0)
-        tmp = hash.insert(IntKey(~(_dfsListTwo[i] -> curSim)), (Wire*)_dfsListTwo[i]);
-      else 
-        tmp = hash.insert(IntKey(_dfsListTwo[i] -> curSim), (Wire*)_dfsListTwo[i]);
-      if(tmp != NULL){
-        if(tmp -> traversed){
-          ((Wire*)_dfsListTwo[i]) -> potentialCut = true;
-          _FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListTwo[i]);
-        }
-        else{
-          tmp -> traversed = true;
-          tmp -> FECNum = _FECpair.size();
-          ((Wire*)_dfsListTwo[i]) -> FECNum = _FECpair.size();
-          _FECpair.push_back(new vector<Wire*>);
-          ((Wire*)tmp) -> potentialCut = true;
-          ((Wire*)_dfsListTwo[i]) -> potentialCut = true;
-          _FECpair[tmp -> FECNum] -> push_back(tmp);
-          _FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListTwo[i]);
-        }
-      }
-    }
-  }
-  cout << "HASH Size:" << hash.size() << endl;
+	for(int i=0; i < _dfsListOne.size(); ++i){
+		_dfsListOne[i] -> operate();;
+		if(_dfsListOne[i] -> gateType == Wir && !(((Wire*)_dfsListOne[i]) -> isCut())){			
+			Wire* tmp;
+			if((_dfsListOne[i] -> curSim & MASK) == 0)
+				tmp = hash.insert(IntKey(~(_dfsListOne[i] -> curSim)), (Wire*)_dfsListOne[i]);
+			else
+				tmp = hash.insert(IntKey(_dfsListOne[i] -> curSim), (Wire*)_dfsListOne[i]);
+			if(tmp != NULL){
+				if(tmp -> traversed){				
+					((Wire*)_dfsListOne[i]) -> potentialCut = true;
+					cout<<tmp -> FECNum<<endl;
+					_FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListOne[i]);
+				}
+				else{
+      	   	tmp -> traversed = true;
+      	   	tmp -> FECNum = _FECpair.size();
+      	 	 	((Wire*)_dfsListOne[i]) -> FECNum = _FECpair.size();
+      		   _FECpair.push_back(new vector<Wire*>);
+      	   	((Wire*)tmp) -> potentialCut = true;
+      	 		((Wire*)_dfsListOne[i]) -> potentialCut = true;
+      	   	_FECpair[tmp -> FECNum] -> push_back(tmp);
+      	   	_FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListOne[i]);
+				}
+			}
+		}
+	
+}
+
+	for(int i=0; i < _dfsListTwo.size(); ++i){
+		_dfsListTwo[i] -> operate();
+		if(_dfsListTwo[i] -> gateType == Wir && !(((Wire*)_dfsListTwo[i]) -> isCut())){
+			Wire* tmp;
+			if((_dfsListTwo[i] -> curSim & MASK) == 0)
+				tmp = hash.insert(IntKey(~(_dfsListTwo[i] -> curSim)), (Wire*)_dfsListTwo[i]);
+			else 
+				tmp = hash.insert(IntKey(_dfsListTwo[i] -> curSim), (Wire*)_dfsListTwo[i]);
+			if(tmp != NULL){
+				if(tmp -> traversed){
+					((Wire*)_dfsListTwo[i]) -> potentialCut = true;
+					cout<<tmp -> FECNum<<endl;
+					cout<<_FECpair[tmp -> FECNum]->size()<<endl;
+					_FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListTwo[i]);
+				 }
+				else{
+					tmp -> traversed = true;
+					tmp -> FECNum = _FECpair.size();
+					((Wire*)_dfsListTwo[i]) -> FECNum = _FECpair.size();
+					_FECpair.push_back(new vector<Wire*>);
+					((Wire*)tmp) -> potentialCut = true;
+					((Wire*)_dfsListTwo[i]) -> potentialCut = true;
+					_FECpair[tmp -> FECNum] -> push_back(tmp);
+					_FECpair[tmp -> FECNum] -> push_back((Wire*)_dfsListTwo[i]);
+				}
+			}
+		}
+	}
+	cout << "HASH Size:" << hash.size() << endl;
 
   //Check gate level
   cout << _FECpair.size() << endl;

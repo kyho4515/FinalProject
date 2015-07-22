@@ -9,15 +9,15 @@ DepList::DepList(vector<Gate*> output_list1,vector<Gate*> output_list2){
 }
 
 DepList::~DepList(){
-  for(int i=0; i < dep_list1.size(); ++i){
+   for(int i=0; i < dep_list1.size(); ++i){
     delete dep_list1[i];
-  }
-  for(int i=0; i < dep_list2.size(); ++i){
+  	}
+   for(int i=0; i < dep_list2.size(); ++i){
     delete dep_list2[i];
-  }
-  for(int i=0; i < dep_list_all.size(); ++i){
+  	}
+   for(int i=0; i < dep_list_all.size(); ++i){
     delete dep_list_all[i];
-  }
+ 	 }
 }
 
 //利用傳進來的output建立dep_list

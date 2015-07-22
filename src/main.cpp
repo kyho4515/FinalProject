@@ -18,13 +18,12 @@ int main(const int argc, const char* argv[]) {
   tm_usage.totalStart();
 
   CircuitCmp circuit(argv[1], argv[2]);
-	//circuit.CheckDivision();
   /*
   cout << "Starting Strash..." << endl;
   circuit.Strash();
   cout << "Ending Strash..." << endl;
   */
-  /*cout << "Starting Sim..." << endl;
+  cout << "Starting Sim..." << endl;
   if(circuit.Simulation())cout << "Equivalent" << endl;
   else cout << "Non-equivalent" << endl;
   cout << "Ending Simulation..." << endl<<endl;
@@ -35,7 +34,7 @@ int main(const int argc, const char* argv[]) {
     circuit.Sat();
   }
   circuit.CheckResult();
-  circuit.WriteFile(argv[3], argv[4]);*/
+  circuit.WriteFile(argv[3], argv[4]);
   tm_usage.getTotalUsage(tm_stat);
   cout << tm_stat.rTime / 1000.0 << "ms" << endl;
   cout << tm_stat.vmPeak / 1024.0 << "MB" << endl;
