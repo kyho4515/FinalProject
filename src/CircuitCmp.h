@@ -192,6 +192,7 @@ class CircuitCmp{
         delete _FECpair[i];
       for(int i=0; i < cutSet.size(); ++i)
         delete cutSet[i];
+      delete dep_list;
     }
     bool Simulation(){
       cout << "Original circuitOne gate size :" << circuitOne -> dfsList.size() << endl

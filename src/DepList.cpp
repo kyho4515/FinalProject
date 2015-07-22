@@ -8,6 +8,18 @@ DepList::DepList(vector<Gate*> output_list1,vector<Gate*> output_list2){
 	merge();
 }
 
+DepList::~DepList(){
+  for(int i=0; i < dep_list1.size(); ++i){
+    delete dep_list1[i];
+  }
+  for(int i=0; i < dep_list2.size(); ++i){
+    delete dep_list2[i];
+  }
+  for(int i=0; i < dep_list_all.size(); ++i){
+    delete dep_list_all[i];
+  }
+}
+
 //利用傳進來的output建立dep_list
 vector<vector<Gate*>*> DepList::build_dep_list(vector<Gate*>& output_list){
 	

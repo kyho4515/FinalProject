@@ -32,10 +32,20 @@ class CirMgr{
 	//function
 	void resetTraversed();
   public:
-    CirMgr(const char* file, int num){ReadVerilog(file, num);}
-    bool ReadVerilog(string inputFile, int num);
-    void DFSearch(Gate*);
-    void WriteOutputFile(const char* );
+   CirMgr(const char* file, int num){ReadVerilog(file, num);}
+   ~CirMgr(){
+     for(int i=0; i < input.size(); ++i)
+       delete input[i];
+     for(int i=0; i < output.size(); ++i)
+       delete output[i];
+     for(int i=0; i < wire.size(); ++i)
+       delete wire[i];
+     delete constTrueGate;
+     delete constFalseGate;
+   }
+   bool ReadVerilog(string inputFile, int num);
+   void DFSearch(Gate*);
+   void WriteOutputFile(const char* );
 	 vector<vector<Gate*>* > Getdep_output();
 	 vector<vector<string>* >Getdep_input();	
 	 Gate* Getoutput(int);
