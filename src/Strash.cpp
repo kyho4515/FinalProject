@@ -40,7 +40,7 @@ bool CircuitCmp::Cut(Gate* x, Gate* y){
   
   //Check output right after cutting
   if(equivalence){
-    if(!Check(x, y)){
+    if(!Check((Wire*)x, (Wire*)y)){
       if(!isCut){
         delete cutSet[Cutnum];
         cutSet.pop_back();

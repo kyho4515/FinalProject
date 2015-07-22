@@ -59,6 +59,7 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
       }
       // 開始讀ouput
       check_semi =0;
+		count_id=0;
       bool check_semi_output=0;
       while (true) {
          getline(inputFile,hold_name,' ');
@@ -215,76 +216,8 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
     for(int i=0; i < output.size(); ++i){
       if(output[i] -> name != "\n"){
 			 DFSearch(output[i]);
-		    //check input將output分群
-			repeat=false;
-			for(int l=0;l<dep_input.size();l++){
-				for(int j=0;j<dep_input[l]->size();j++){
-					if(repeat)
-						break;
-					else{
-						for(int k=0;k<output[i]->total_input.size();k++){
-							if(dep_input[l]->at(j)==output[i]->total_input[k]->name){
-								repeat=true;
-								break;
-							}
-							else if(dep_input[l]->at(j)<output[i]->total_input[k]->name)
-								break;
-						}
-					}
-				}
-				if(repeat){
-					dep_output[l]->push_back(output[i]);
-					vector<string>*s1=dep_input[l];
-					vector<Gate*>s2=output[i]->total_input;
-					vector<string>s3;
-					while(s1->size()!=0 || s2.size()!=0){
-						if(s2.size()==0 || (s1->size()!=0 && s1->back()>s2.back()->name)){
-							s3.push_back(s1->back());
-							s1->pop_back();
-						}
-						else if(s1->size()==0 || (s2.size()!=0 && s1->back()<s2.back()->name)){
-							s3.push_back(s2.back()->name);
-							s2.pop_back();
-						}
-						else {
-							s3.push_back(s2.back()->name);
-							s2.pop_back();
-							s1->pop_back();
-						}	
-					}							
-					dep_input[l]->clear();
-					while(s3.size()!=0){
-						dep_input[l]->push_back(s3.back());
-						s3.pop_back();
-					}
-					break;
-				}
-			}
-			if(!repeat){
-				dep_output.push_back(new vector<Gate*>);
-				dep_output[dep_output.size()-1]->push_back(output[i]);
-				dep_input.push_back(new vector<string>);
-				for(int j=0;j<output[i]->total_input.size();j++){
-					dep_input[dep_input.size()-1]->push_back(output[i]->total_input[j]->name);
-				}
-			}
-		}
-	}
-	cout<<"output size:"<<output.size()<<endl<<"group size:"<<dep_input.size()<<endl;
-	for(int i=0;i<dep_input.size();i++){
-		cout<<"size of group "<<i+1<<" is "<<dep_output[i]->size()<<endl;
-		cout<<"  ";
-		for(int j=0;j<dep_output[i]->size();j++){
-			cout<<dep_output[i]->at(j)->name<<", ";
-		}
-		cout<<endl;
-		for(int j=0;j<dep_input[i]->size();j++){
-			cout<<dep_input[i]->at(j)<<", ";
-		}
-		if(dep_input[i]->size()==0)cout<<dep_output[i]->at(0)->name<<endl;
-		cout<<endl<<endl;
-	}
-	cout<<endl;
+		 }
+	   }
 // 7/14 //
 	//填入vector<Gate*> final_output
 	for(int i=dfsList.size();i>0;i--){
@@ -456,13 +389,7 @@ void CirMgr::WriteOutputFile(const char* name){
 	fout<<"endmodule"<<endl;
 }
 
-vector<vector<Gate*>* > CirMgr::Getdep_output(){
-	return dep_output;
-}
 
-vector<vector<string>* >CirMgr::Getdep_input(){
-	return dep_input;
-}
 
 Gate* CirMgr::Getoutput(int n){
 	return output[n];

@@ -13,6 +13,7 @@
 #include "CirMgr.h"
 #include "Gate.h"
 #include "sat/sat.h"
+#include "DepList.h"
 using namespace std;
 
 class CircuitCmp{
@@ -29,7 +30,7 @@ class CircuitCmp{
     vector<Var> outputXor;
     SatSolver solver;
     bool equivalence;
-	 
+	 DepList* dep_list;
 	
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
@@ -60,14 +61,49 @@ class CircuitCmp{
     void SimFilter(int, vector<Gate*>&, vector<Gate*>&);
     bool CheckReachability();
     bool CheckReach(Gate* source);
-    bool Check(Wire* a, Wire* b){
+    bool Check(){
+      dfsListOne.clear();
+      dfsListTwo.clear();
+      for(int i=0; i < circuitOne -> output.size(); ++i){
+        DFSearch(circuitOne -> output[i],dfsListOne);
+        DFSearch(circuitTwo -> output[i],dfsListTwo);
+      }
+      circuitOne -> resetTraversed();
+      circuitTwo -> resetTraversed();
+      if(equivalence){
+          //cout << "still equivalent" << endl;
+        if(SimCheck(1,dfsListOne, dfsListTwo)){
+          solver.initialize();
+          genProofModel(dfsListOne, dfsListTwo);
+          for(int i=0; i < outputXor.size(); ++i){
+            solver.assumeProperty(outputXor[i], true);
+          }
+          solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
+          solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
+          if(!solver.assumpSolve())
+            return true;
+          else 
+            return false;
+        }
+        else 
+          return false;
+        //else assert(0);
+      }
+      return true;
+    }
+    bool proveSAT(Wire*, Wire*);
+	 void ModifyInput(Gate*);
+	 void Replace(Gate* gate);
+
+
+	bool Check(Wire* a, Wire* b){
       dfsListOne.clear();
       dfsListTwo.clear();
       if(equivalence){
         vector<string> tmp;
         while(true){
-          i=0;
-          j=0;
+          int i=0;
+          int j=0;
           if(a -> final_output[i] -> name > b -> final_output[j] -> name || i >= a -> final_output.size()){
             tmp.push_back(b -> final_output[j] -> name);
             ++j;
@@ -124,31 +160,30 @@ class CircuitCmp{
         return true;
       }
     }
-    bool proveSAT(Wire*, Wire*);
-	  void ModifyInput(Gate*);
-	  void Replace(Gate* gate);
   public:
-    CircuitCmp(const char* file1, const char* file2){
+      CircuitCmp(const char* file1, const char* file2){
 			cout<<endl<<"read circuitone"<<endl<<endl;
-    	circuitOne = new CirMgr(file1, 1);
+      	circuitOne = new CirMgr(file1, 1);
 			cout<<endl<<"read circuittwo"<<endl<<endl;
-     	circuitTwo = new CirMgr(file2, 2);
-     	CurGateLevel = 2;
-     	CurCutLevel = 0;
-     	if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
-			equivalence = true;
-     	else 
-			equivalence = false;
-     	solver.initialize();
-     	genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);
-     	for(int i=0; i < outputXor.size(); ++i){
-       		solver.assumeProperty(outputXor[i], true);
-    	}
-     	solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
-     	solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
-     	bool result = solver.assumpSolve();
-     	assert((equivalence && !result) || (!equivalence && result));
-   	}
+      	circuitTwo = new CirMgr(file2, 2);
+      	CurGateLevel = 2;
+      	CurCutLevel = 0;
+      	if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
+				equivalence = true;
+      	else 
+				equivalence = false;
+      	solver.initialize();
+      	genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);
+      	for(int i=0; i < outputXor.size(); ++i){
+        		solver.assumeProperty(outputXor[i], true);
+      			}
+      	solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
+      	solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
+      	bool result = solver.assumpSolve();
+      	assert((equivalence && !result) || (!equivalence && result));
+			dep_list=new DepList(circuitOne->output,circuitTwo->output);
+			dep_list->Out();
+   		 }
 
     ~CircuitCmp(){
       delete circuitOne;

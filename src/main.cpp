@@ -35,8 +35,8 @@ int main(const int argc, const char* argv[]) {
     circuit.Sat();
   }
   circuit.CheckResult();
-  circuit.WriteFile(argv[3], argv[4]);
+  circuit.WriteFile(argv[3], argv[4]);*/
   tm_usage.getTotalUsage(tm_stat);
   cout << tm_stat.rTime / 1000.0 << "ms" << endl;
-  cout << tm_stat.vmPeak / 1024.0 << "MB" << endl;*/
+  cout << tm_stat.vmPeak / 1024.0 << "MB" << endl;
 }

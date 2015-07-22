@@ -1,6 +1,7 @@
 #include "CircuitCmp.h"
 #define MASK 0x1
 
+
 bool CircuitCmp::SimCheck(bool mode,vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
   RandGenerator rand;
   int count = 0;

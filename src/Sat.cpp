@@ -130,7 +130,7 @@ void CircuitCmp::Sat(){
           if(proveSAT(_FECpair[i] -> at(j), _FECpair[i] -> at(k))){
             if(Cut(_FECpair[i]->at(j)->input[0], _FECpair[i]->at(k)->input[0])){
 ///////////////////////////////////6/29
-					cout<<_FECpair[i]->at(j)->name<<":"<<_FECpair[i]->at(k)->name<<endl;
+					/*cout<<_FECpair[i]->at(j)->name<<":"<<_FECpair[i]->at(k)->name<<endl;
 					if(_FECpair[i]->at(j)->total_cut_name.size()==0 || _FECpair[i]->at(j)->total_cut_name[0]!=_FECpair[i]->at(j)->cutNum){
 						_FECpair[i]->at(j)->total_input_name.clear();
 						_FECpair[i]->at(j)->total_cut_name.clear();
@@ -144,7 +144,7 @@ void CircuitCmp::Sat(){
 						ModifyInput(_FECpair[i]->at(k));
 					}					
 					circuitOne->resetTraversed();
-					circuitTwo->resetTraversed();
+					circuitTwo->resetTraversed();*/
 					
 ////////////////////////////////////////////////////////////////
               vector<Wire*>::iterator it = _FECpair[i] -> begin()+k;

@@ -28,9 +28,7 @@ class CirMgr{
     gmap gateMap;
     Gate* constTrueGate;
     Gate* constFalseGate;
-	 vector<vector<Gate*>* >dep_output;
-	 vector<vector<string>* >dep_input;
-    
+
 	//function
 	void resetTraversed();
   public:

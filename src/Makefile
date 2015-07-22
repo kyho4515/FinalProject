@@ -69,3 +69,4 @@ Sat_dbg.o: Sat.cpp CircuitCmp.h
 
 DepList_dbg.o: DepList.cpp DepList.h Gate.h
 	$(CXX) $(DBGFLAGS) -c $< -o $@
+

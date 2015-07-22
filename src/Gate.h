@@ -58,6 +58,7 @@ public:
 	//functions
   Gate(string n, int a, GateType i):name(n),idd(a), gateType(i), traversed(false){curSim = 0;}
   Gate(string n, int a, GateType i, bool p):name(n),idd(a), gateType(i), traversed(false), phase(p){curSim = 0;}
+  Gate(string n, int a, GateType i, bool p, int value):name(n),idd(a), gateType(i), traversed(false), phase(p),curSim(value){}
   virtual void operate() = 0;
   virtual void constructSat(SatSolver& s,Var&) = 0;
   void setVar(Var& v){var = v;}
@@ -76,10 +77,9 @@ class InputGate:public Gate{
 
 class ConstGate:public Gate{
   public:
-    ConstGate(const string n, int a, bool p, int value): Gate(n, a, Const, p),curSim(value){}
+    ConstGate(const string n, int a, bool p, int value): Gate(n, a, Const, p, value){}
     void operate(){}
     void constructSat(SatSolver& s, Var& Const){}
-	 int const curSim;
   private:
 	
 };
