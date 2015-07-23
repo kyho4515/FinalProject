@@ -40,6 +40,8 @@ class CirMgr{
        delete output[i];
      for(int i=0; i < wire.size(); ++i)
        delete wire[i];
+     for(int i=0; i < gate.size(); ++i)
+       delete gate[i];
      delete constTrueGate;
      delete constFalseGate;
    }
