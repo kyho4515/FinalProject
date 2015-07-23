@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include "Gate.h"
+#include "ConstWire.h"
 using namespace std;
 typedef map<string, Gate*> gmap;
 
@@ -28,11 +29,11 @@ class CirMgr{
     gmap gateMap;
     Gate* constTrueGate;
     Gate* constFalseGate;
-
+	 ConstWire *const_wire;
 	//function
 	void resetTraversed();
   public:
-   CirMgr(const char* file, int num){ReadVerilog(file, num);}
+   CirMgr(const char* file, int num){ReadVerilog(file, num);/*onst_wire=new ConstWire(input,dfsList);*/}
    ~CirMgr(){
      for(int i=0; i < input.size(); ++i)
        delete input[i];

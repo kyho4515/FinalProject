@@ -4,17 +4,23 @@
 #include <vector>
 #include <queue>
 #include "Gate.h"
+#include "util.h"
 class ConstWire{
 	public:
-		ConstWire(CirMgr*,CirMgr*);
+		ConstWire(vector<Gate*>input,vector<Gate*>dfs_list);
 		~ConstWire();
 		void Out()const;
 	private:
-		vector<vector<Wire*>*>const1;
-		vector<vector<Wire*>*>const0;
-		void findconst(vector<Gate*>&);//找到所有const wire
-		vector<Wire*> simulation(vector<Gate*>&, vector<Gate*>&);//初步挑出是const的wire(回傳的vector是1.0混合的)
-		bool checkconstant(Wire*)
+		vector<Wire*>const1;
+		vector<Wire*>const0;
+		vector<Gate*>input;
+		vector<Gate*>dfslist;
+		vector<Gate*>storage;//儲存DFSandOperate後產生的dfslist
+		queue<Wire*> simulation(vector<Gate*>&, vector<Gate*>&, int);//初步挑出是const的wire(回傳的vector是1.0混合的)
+		bool checkconstant(Wire*);
+		void DFSandOperate(Gate*);//更新gate的curSim
+		void resetTraversed();//reset traversed
+		
 };
 
 #endif

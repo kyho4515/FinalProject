@@ -215,11 +215,11 @@ void CircuitCmp::genProofModel(vector<Gate*>& dfslistOne, vector<Gate*>& dfslist
       int cutNum = ((Wire*)dfslistOne[i]) -> cutNum; 
       for(int j=0; j < cutSet[cutNum] -> size(); ++j)
         cutSet[cutNum] -> at(j) -> setVar(v);
-    }
+         }
     else if(dfslistOne[i] -> gateType != Wir && dfslistOne[i] -> gateType != Input && dfslistOne[i] -> gateType != Output){
       Var v = solver.newVar();
       dfslistOne[i] -> setVar(v);
-    }
+         }
   }
   for(int i=0; i < dfslistTwo.size(); ++i){
     if(dfslistTwo[i] -> gateType != Input && dfslistTwo[i] -> gateType != Wir && dfslistTwo[i] -> gateType != Output){

@@ -23,6 +23,7 @@ int main(const int argc, const char* argv[]) {
   circuit.Strash();
   cout << "Ending Strash..." << endl;
   */
+
   cout << "Starting Sim..." << endl;
   if(circuit.Simulation())cout << "Equivalent" << endl;
   else cout << "Non-equivalent" << endl;

@@ -181,8 +181,8 @@ class CircuitCmp{
       	solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
       	bool result = solver.assumpSolve();
       	assert((equivalence && !result) || (!equivalence && result));
-			dep_list=new DepList(circuitOne->output,circuitTwo->output);
-			dep_list->Out();
+			//dep_list=new DepList(circuitOne->output,circuitTwo->output);
+			//dep_list->Out();
    		 }
 
     ~CircuitCmp(){
