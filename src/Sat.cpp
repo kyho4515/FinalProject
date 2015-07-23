@@ -171,13 +171,13 @@ void CircuitCmp::Sat(){
 bool CircuitCmp::proveSAT(Wire* one, Wire* two){
   if(one -> circuitNum != two -> circuitNum){
    //if(CheckGoodCut(one, two)){
-      /*
+      
       vector<Gate*> dfsListOne, dfsListTwo;
       DFSearch(one -> input[0], dfsListOne);
       DFSearch(two -> input[0], dfsListTwo);
       circuitOne -> resetTraversed();
       circuitTwo -> resetTraversed();
-      genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);*/
+      genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);
       Var v = solver.newVar();
       if(one -> curSim == two -> curSim)
         solver.addXorCNF(v, one -> input[0] -> getVar(), (one->input[0]->phase) ? true:false, two -> input[0] -> getVar(), (two->input[0]->phase) ? true:false);
@@ -235,11 +235,11 @@ void CircuitCmp::genProofModel(vector<Gate*>& dfslistOne, vector<Gate*>& dfslist
   circuitTwo -> constFalseGate -> setVar(F);
   if(equivalence){
     outputXor.clear();
-    for(int i=0; i < circuitOne -> output.size(); ++i){
+    for(int i=0; i < CheckOutputNum.size(); ++i){
       outputXor.push_back(solver.newVar());
-      Gate* one = circuitOne -> output[i] -> input[0];
-      Gate* two = circuitTwo -> output[i] -> input[0];
-      if(circuitOne -> output[i] -> curSim == circuitTwo -> output[i] -> curSim)
+      Gate* one = circuitOne -> output[CheckOutputNum[i]] -> input[0];
+      Gate* two = circuitTwo -> output[CheckOutputNum[i]] -> input[0];
+      if(circuitOne -> output[CheckOutputNum[i]] -> curSim == circuitTwo -> output[CheckOutputNum[i]] -> curSim)
         solver.addXorCNF(outputXor[i], one -> getVar(), (one->phase) ? true:false, two -> getVar(), (two->phase) ? true:false);
       else{
         assert(circuitOne->output[i] ->curSim == ~(circuitTwo ->output[i]->curSim));
@@ -255,9 +255,3 @@ void CircuitCmp::genProofModel(vector<Gate*>& dfslistOne, vector<Gate*>& dfslist
     dfslistTwo[i] -> constructSat(solver, T);
   solver.assumeRelease();
 }
-
-
-
-
-		
-

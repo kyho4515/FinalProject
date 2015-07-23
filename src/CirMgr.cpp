@@ -367,7 +367,7 @@ void CirMgr::WriteOutputFile(const char* name){
 		}		
 		//input wire
 		for(int n=0;n<gate[i]->input.size();n++){
-			if(((Wire*)(gate[i]->input[n]))->isCut())
+			if(gate[i] -> input[n] -> gateType == Wir && ((Wire*)(gate[i]->input[n]))->isCut())
 				fout<<gate[i]->input[n]->name<<gate[i]->input[n]->name;
 			else 
 				fout<<gate[i]->input[n]->name;

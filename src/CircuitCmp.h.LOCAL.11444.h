@@ -30,8 +30,7 @@ class CircuitCmp{
     vector<Var> outputXor;
     SatSolver solver;
     bool equivalence;
-    vector<int> CheckOutputNum; // store the output that should be check
-	  DepList* dep_list;
+	 DepList* dep_list;
 	
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
@@ -102,34 +101,26 @@ class CircuitCmp{
       dfsListTwo.clear();
       if(equivalence){
         vector<string> tmp;
-        int i=0;
-        int j=0;
         while(true){
-          if(i >= a -> final_output.size() && j < b -> final_output.size()){
+          int i=0;
+          int j=0;
+          if(a -> final_output[i] -> name > b -> final_output[j] -> name || i >= a -> final_output.size()){
             tmp.push_back(b -> final_output[j] -> name);
             ++j;
           }
-          else if(i < a -> final_output.size() && j >= b -> final_output.size()){
+          else if(a -> final_output[i] -> name < b -> final_output[j] ->name || j >= b -> final_output.size()){
             tmp.push_back(a -> final_output[i] -> name);
             ++i;
           }
           else if(i >= a -> final_output.size() && j >= b -> final_output.size())
             break;
-          else if(a -> final_output[i] -> name > b -> final_output[j] -> name){
-            tmp.push_back(b -> final_output[j] -> name);
-            ++j;
-          }
-          else if(a -> final_output[i] -> name < b -> final_output[j] ->name){
-            tmp.push_back(a -> final_output[i] -> name);
-            ++i;
-          }
           else{
             tmp.push_back(b -> final_output[j] -> name);
             ++j;
             ++i;
           }
         }
-        CheckOutputNum.clear();
+        vector<int> CheckOutputNum; // store the output that should be check
         for(int i=0; i < circuitOne -> output.size(); ++i){
           for(int j=0; j < tmp.size(); ++j){
             if(circuitOne -> output[i] -> name == tmp[j]){
@@ -145,7 +136,7 @@ class CircuitCmp{
         if(SimCheck(1,dfsListOne, dfsListTwo)){
           solver.initialize();
           genProofModel(dfsListOne, dfsListTwo);
-          for(int i=0; i < outputXor.size(); ++i){
+          for(int i=0; i < CheckOutputNum.size(); ++i){
             solver.assumeProperty(outputXor[i], true);
           }
           solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
@@ -171,22 +162,18 @@ class CircuitCmp{
     }
   public:
       CircuitCmp(const char* file1, const char* file2){
-			  cout<<endl<<"read circuitone"<<endl<<endl;
-        circuitOne = new CirMgr(file1, 1);
-			  cout<<endl<<"read circuittwo"<<endl<<endl;
-        circuitTwo = new CirMgr(file2, 2);
-        CurGateLevel = 2;
-        CurCutLevel = 0;
-        if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
-			    equivalence = true;
-        else 
-				  equivalence = false;
+			cout<<endl<<"read circuitone"<<endl<<endl;
+      	circuitOne = new CirMgr(file1, 1);
+			cout<<endl<<"read circuittwo"<<endl<<endl;
+      	circuitTwo = new CirMgr(file2, 2);
+      	CurGateLevel = 2;
+      	CurCutLevel = 0;
+      	if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
+				equivalence = true;
+      	else 
+				equivalence = false;
       	solver.initialize();
-        CheckOutputNum.clear();
-        for(int i=0; i < circuitOne->output.size(); ++i)
-          CheckOutputNum.push_back(i);
       	genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);
-<<<<<<< HEAD
       	for(int i=0; i < outputXor.size(); ++i){
         		solver.assumeProperty(outputXor[i], true);
       			}
@@ -197,18 +184,6 @@ class CircuitCmp{
 			//dep_list=new DepList(circuitOne->output,circuitTwo->output);
 			//dep_list->Out();
    		 }
-=======
-        for(int i=0; i < outputXor.size(); ++i){
-      	  solver.assumeProperty(outputXor[i], true);
-        }
-        solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
-        solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
-        bool result = solver.assumpSolve();
-        assert((equivalence && !result) || (!equivalence && result));
-			  dep_list=new DepList(circuitOne->output,circuitTwo->output);
-			  dep_list->Out();
-   		}
->>>>>>> ab877e03a6f7c7722acc266be54dd98e49e3fe3f
 
     ~CircuitCmp(){
       delete circuitOne;
