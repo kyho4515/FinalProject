@@ -186,18 +186,6 @@ class CircuitCmp{
         for(int i=0; i < circuitOne->output.size(); ++i)
           CheckOutputNum.push_back(i);
       	genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);
-<<<<<<< HEAD
-      	for(int i=0; i < outputXor.size(); ++i){
-        		solver.assumeProperty(outputXor[i], true);
-      			}
-      	solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
-      	solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
-      	bool result = solver.assumpSolve();
-      	assert((equivalence && !result) || (!equivalence && result));
-			//dep_list=new DepList(circuitOne->output,circuitTwo->output);
-			//dep_list->Out();
-   		 }
-=======
         for(int i=0; i < outputXor.size(); ++i){
       	  solver.assumeProperty(outputXor[i], true);
         }
@@ -208,7 +196,6 @@ class CircuitCmp{
 			  dep_list=new DepList(circuitOne->output,circuitTwo->output);
 			  dep_list->Out();
    		}
->>>>>>> ab877e03a6f7c7722acc266be54dd98e49e3fe3f
 
     ~CircuitCmp(){
       delete circuitOne;
