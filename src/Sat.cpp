@@ -121,6 +121,7 @@ void CircuitCmp::Sat(){
     for(int i=0; i < cutWire.size(); ++i)
       cutWire[i]->cutLevel = CurCutLevel;
   }*/
+	cout<<"start SAT..."<<endl;
   CurGateLevel +=2;
  
   for(int i=0; i < _FECpair.size();++i){

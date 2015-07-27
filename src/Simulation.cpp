@@ -1,4 +1,5 @@
 #include "CircuitCmp.h"
+
 #define MASK 0x1
 
 
@@ -59,35 +60,40 @@ bool CircuitCmp::SimCheck(bool mode,vector<Gate*>& _dfsListOne, vector<Gate*>& _
 }
 
 void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
-  for(int i=0; i < _FECpair.size(); ++i){
-    for(int j=0; j < _FECpair[i] -> size(); ++j)
-      _FECpair[i]->at(j)->potentialCut = false;
-    delete _FECpair[i];
-  }
-  _FECpair.clear();
-  RandGenerator rand;
+	for(int i=0; i < _FECpair.size(); ++i){
+		for(int j=0; j < _FECpair[i] -> size(); ++j)
+      	_FECpair[i]->at(j)->potentialCut = false;
+    	delete _FECpair[i];
+  	}
+   _FECpair.clear();
+   RandGenerator rand;
 
-  for(int i=0; i < circuitOne -> input.size(); ++i){
-    int tmp = rand.getRand();
-    circuitOne -> input[i] -> curSim = tmp;
-    circuitTwo -> input[i] -> curSim = tmp;
-  }
-  for(int i=0; i < cutSet.size(); ++i){
-    int tmp = rand.getRand();
-    for(int j=0; j < cutSet[i] -> size(); ++j){
-      if(cutSet[i] -> at(j) -> phase)
-        cutSet[i] -> at(j) -> curSim = tmp;
-      else
-        cutSet[i] -> at(j) -> curSim = ~tmp;
-    }
-  }
-	
-  circuitOne -> constTrueGate -> curSim = ~0;
+	assert(circuitOne -> input.size()==circuitTwo -> input.size());
+   for(int i=0; i < circuitOne -> input.size(); ++i){
+     int tmp = rand.getRand();
+     circuitOne -> input[i] -> curSim = tmp;
+     circuitTwo -> input[i] -> curSim = tmp;
+      	}
+
+  	for(int i=0; i < cutSet.size(); ++i){
+    	int tmp = rand.getRand();
+    	for(int j=0; j < cutSet[i] -> size(); ++j){
+    	  if(cutSet[i] -> at(j) -> phase)
+     	    cutSet[i] -> at(j) -> curSim = tmp;
+     	  else
+          cutSet[i] -> at(j) -> curSim = ~tmp;
+       		}
+  	}
+	assert(circuitOne -> constTrueGate -> curSim==~0);
+	assert(circuitOne -> constFalseGate -> curSim==0);
+	assert(circuitTwo -> constTrueGate -> curSim==~0);
+	assert(circuitTwo -> constFalseGate -> curSim==0);
+  /*circuitOne -> constTrueGate -> curSim = ~0;
   circuitOne -> constFalseGate -> curSim = 0;
   circuitTwo -> constTrueGate -> curSim = ~0;
-  circuitTwo -> constFalseGate -> curSim = 0;
+  circuitTwo -> constFalseGate -> curSim = 0;*/
   HashMap<IntKey, Wire*> hash(circuitOne -> wire.size()+circuitTwo -> wire.size());
-
+	
 	for(int i=0; i < _dfsListOne.size(); ++i){
 		_dfsListOne[i] -> operate();;
 		if(_dfsListOne[i] -> gateType == Wir && !(((Wire*)_dfsListOne[i]) -> isCut())){			
@@ -141,10 +147,14 @@ void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
 			}
 		}
 	}
+	assert(circuitOne -> constTrueGate -> curSim==~0);
+	assert(circuitOne -> constFalseGate -> curSim==0);
+	assert(circuitTwo -> constTrueGate -> curSim==~0);
+	assert(circuitTwo -> constFalseGate -> curSim==0);
 	cout << "HASH Size:" << hash.size() << endl;
-
-	//Check gate level//
 	cout << _FECpair.size() << endl;
+	
+	//Check gate level//	
 	for(int i=0; i < _FECpair.size(); ++i){
 		for(int j=0; j < _FECpair[i] -> size(); ++j){
 			if(_FECpair[i] -> at(j) -> gateLevel != CurGateLevel){
@@ -214,6 +224,13 @@ void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
       			}
     		}
   	}
+
+/*	
+	Ppair=new PotentialPair(_FECpair);
+	Ppair->Out();
+*/
+	//assert(0);
+	
 }
 
 void CircuitCmp::SimFilter(int Count, vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){

@@ -27,7 +27,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 static inline int left  (int i) { return i+i; }
 static inline int right (int i) { return i+i + 1; }
 static inline int parent(int i) { return i >> 1; }
-
+#include <iostream>
+using namespace std;
 template<class C>
 class Heap {
   public:

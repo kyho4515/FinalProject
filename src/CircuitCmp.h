@@ -13,7 +13,7 @@
 #include "CirMgr.h"
 #include "Gate.h"
 #include "sat/sat.h"
-#include "DepList.h"
+#include "pair.h"
 using namespace std;
 
 class CircuitCmp{
@@ -31,8 +31,8 @@ class CircuitCmp{
     SatSolver solver;
     bool equivalence;
     vector<int> CheckOutputNum; // store the output that should be check
-	  DepList* dep_list;
-	
+	 // DepList* dep_list;
+	 PotentialPair *Ppair;
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
       if(one -> input.size() == two -> input.size() && one -> gateType == two -> gateType){
@@ -93,10 +93,6 @@ class CircuitCmp{
       return true;
     }
     bool proveSAT(Wire*, Wire*);
-	 void ModifyInput(Gate*);
-	 void Replace(Gate* gate);
-
-
 	bool Check(Wire* a, Wire* b){
       dfsListOne.clear();
       dfsListTwo.clear();
@@ -193,8 +189,8 @@ class CircuitCmp{
         solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
         bool result = solver.assumpSolve();
         assert((equivalence && !result) || (!equivalence && result));
-			  dep_list=new DepList(circuitOne->output,circuitTwo->output);
-			  dep_list->Out();
+			 // dep_list=new DepList(circuitOne->output,circuitTwo->output);
+			  //dep_list->Out();
    		}
 
     ~CircuitCmp(){
@@ -204,7 +200,7 @@ class CircuitCmp{
         delete _FECpair[i];
       for(int i=0; i < cutSet.size(); ++i)
         delete cutSet[i];
-      delete dep_list;
+     // delete dep_list;
     }
     bool Simulation(){
       cout << "Original circuitOne gate size :" << circuitOne -> dfsList.size() << endl

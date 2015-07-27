@@ -34,6 +34,7 @@ int main(const int argc, const char* argv[]) {
     circuit.Simulation(1);
     circuit.Sat();
   }
+	cout<<"SAT end..."<<endl;
   circuit.CheckResult();
   circuit.WriteFile(argv[3], argv[4]);
   tm_usage.getTotalUsage(tm_stat);
