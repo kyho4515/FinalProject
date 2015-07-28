@@ -153,7 +153,7 @@ void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
 	assert(circuitTwo -> constFalseGate -> curSim==0);
 	cout << "HASH Size:" << hash.size() << endl;
 	cout << _FECpair.size() << endl;
-	
+
 	//Check gate level//	
 	for(int i=0; i < _FECpair.size(); ++i){
 		for(int j=0; j < _FECpair[i] -> size(); ++j){
@@ -174,6 +174,7 @@ void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
     		}
   	}
 	//......//
+/*
    cout << "After gateLevel: " << _FECpair.size() << endl;
    circuitOne -> resetTraversed();
    circuitTwo -> resetTraversed();
@@ -224,12 +225,12 @@ void CircuitCmp::SimFEC(vector<Gate*>& _dfsListOne, vector<Gate*>& _dfsListTwo){
       			}
     		}
   	}
-
-/*	
+*/
+	
 	Ppair=new PotentialPair(_FECpair);
 	Ppair->Out();
-*/
-	//assert(0);
+	cout << _FECpair.size() << endl;
+	assert(0);
 	
 }
 

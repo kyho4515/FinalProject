@@ -126,6 +126,7 @@ void CircuitCmp::Sat(){
  
   for(int i=0; i < _FECpair.size();++i){
 //    if(_FECpair[i] -> size() < 10){
+		cout<<"i="<<i<<endl;
       for(int j=0; j < _FECpair[i] -> size(); ++j){
         for(int k=_FECpair[i] -> size()-1; k > j; --k){	
           if(proveSAT(_FECpair[i] -> at(j), _FECpair[i] -> at(k))){
@@ -171,7 +172,7 @@ void CircuitCmp::Sat(){
 
 bool CircuitCmp::proveSAT(Wire* one, Wire* two){
   if(one -> circuitNum != two -> circuitNum){
-   //if(CheckGoodCut(one, two)){
+   if(CheckGoodCut(one, two)){
       
       vector<Gate*> dfsListOne, dfsListTwo;
       DFSearch(one -> input[0], dfsListOne);
@@ -198,8 +199,8 @@ bool CircuitCmp::proveSAT(Wire* one, Wire* two){
  //solver.printStats();
       if(!result) return true;
       else return false;
-   // }
-    //else return false;
+   }
+    else return false;
   }
   else return false;
 }

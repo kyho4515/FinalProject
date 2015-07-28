@@ -30,7 +30,7 @@ int main(const int argc, const char* argv[]) {
   cout << "Ending Simulation..." << endl<<endl;
   circuit.Sat();
   
-  for(int i=0; i < 2; ++i){
+  for(int i=0; i < 1; ++i){
     circuit.Simulation(1);
     circuit.Sat();
   }
