@@ -1,7 +1,8 @@
-PKGFLAG   =
-EXTHDRS   = sat.h Solver.h SolverTypes.h VarOrder.h Proof.h Global.h \
-            File.h Heap.h Sort.h
+CXX := g++
+CPPFLAGS := -O2
 
+all:	sat.o;
 
-include ../Makefile.in
-include ../Makefile.lib
+sat.o: sat.h Solver.h
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+

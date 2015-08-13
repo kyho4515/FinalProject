@@ -201,6 +201,9 @@ public:
     // Printing:
     //
     void printStats();
+
+	//my function
+	int clauses_size(){return clauses.size();}
 };
 
 

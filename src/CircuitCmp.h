@@ -31,7 +31,6 @@ class CircuitCmp{
     SatSolver solver;
     bool equivalence;
     vector<int> CheckOutputNum; // store the output that should be check
-	 // DepList* dep_list;
 	 PotentialPair *Ppair;
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
@@ -92,7 +91,7 @@ class CircuitCmp{
       }
       return true;
     }
-    bool proveSAT(Wire*, Wire*);
+   bool proveSAT(Wire*, Wire*);
 	bool Check(Wire* a, Wire* b){
       dfsListOne.clear();
       dfsListTwo.clear();
@@ -165,92 +164,42 @@ class CircuitCmp{
         return true;
       }
     }
-  public:
-      CircuitCmp(const char* file1, const char* file2){
-			  cout<<endl<<"read circuitone"<<endl<<endl;
-        circuitOne = new CirMgr(file1, 1);
-			  cout<<endl<<"read circuittwo"<<endl<<endl;
-        circuitTwo = new CirMgr(file2, 2);
-        CurGateLevel = 2;
-        CurCutLevel = 0;
-        if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
-			    equivalence = true;
-        else 
-				  equivalence = false;
-      	solver.initialize();
-        CheckOutputNum.clear();
-        for(int i=0; i < circuitOne->output.size(); ++i)
-          CheckOutputNum.push_back(i);
-      	genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);
-        for(int i=0; i < outputXor.size(); ++i){
-      	  solver.assumeProperty(outputXor[i], true);
-        }
-        solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
-        solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
-        bool result = solver.assumpSolve();
-        assert((equivalence && !result) || (!equivalence && result));
-			 // dep_list=new DepList(circuitOne->output,circuitTwo->output);
-			  //dep_list->Out();
-   		}
+	public:
+		CircuitCmp(const char* , const char* );
+    	~CircuitCmp();  	
+   	void Simulation();
+    	void Strash();
+    	void Sat();
+    	void Simulation(int l);
+    	void WriteFile(const char* , const char* );
+     	bool CircuitEquiCheck();
 
-    ~CircuitCmp(){
-      delete circuitOne;
-      delete circuitTwo;
-      for(int i=0; i < _FECpair.size(); ++i)
-        delete _FECpair[i];
-      for(int i=0; i < cutSet.size(); ++i)
-        delete cutSet[i];
-     // delete dep_list;
-    }
-    bool Simulation(){
-      cout << "Original circuitOne gate size :" << circuitOne -> dfsList.size() << endl
-           << "Original circuitTwo gate size :" << circuitTwo -> dfsList.size() << endl;
-      SimFEC(circuitOne -> dfsList, circuitTwo -> dfsList);
-      SimFilter(500, circuitOne -> dfsList, circuitTwo -> dfsList);
-      return equivalence;
-	}
-
-    void Strash();
-    void Sat();
-    void Simulation(int l){
-      //if(!Check()) assert(0);
-      SimFEC(dfsListOne, dfsListTwo);
-      SimFilter(500, dfsListOne, dfsListTwo);
-    }
-    void WriteFile(const char* file1, const char* file2){
-      circuitOne->WriteOutputFile(file1);
-      circuitTwo->WriteOutputFile(file2);
-    }
-
-    void CheckResult(){
-      vector<Gate*> dfsOne,dfsTwo;
-      for(int i=0; i < circuitOne-> output.size(); ++i){
-        dfsOne.clear();
-        DFSearch(circuitOne -> output[i], dfsOne);
-        int count = 0;
-        for(int j=0; j < dfsOne.size(); ++j){
-          if(dfsOne[j] -> gateType == Wir && ((Wire*)dfsOne[j])->isCut())
-            ++count;
-          else if(dfsOne[j] -> gateType != Wir && dfsOne[j] -> gateType != Output && dfsOne[j] -> gateType != Input)
-            ++count;
-        }
-        cout << count << endl;
-      }
-      for(int i=0; i < circuitTwo-> output.size(); ++i){
-        dfsTwo.clear();
-        DFSearch(circuitTwo -> output[i], dfsTwo);
-        int count = 0;
-        for(int j=0; j < dfsTwo.size(); ++j){
-          if(dfsTwo[j] -> gateType == Wir && ((Wire*)dfsTwo[j])->isCut())
-            ++count;
-          else if(dfsTwo[j] -> gateType != Wir && dfsTwo[j] -> gateType != Output && dfsTwo[j] -> gateType != Input)
-            ++count;
-        }
-        cout << count << endl;
-      }
-    }
-	//in My_Simulation.cpp
-	bool My_Simulation();
-	void CheckDivision();
+    	void CheckResult(){
+      	vector<Gate*> dfsOne,dfsTwo;
+      	for(int i=0; i < circuitOne-> output.size(); ++i){
+        		dfsOne.clear();
+        		DFSearch(circuitOne -> output[i], dfsOne);
+        		int count = 0;
+        		for(int j=0; j < dfsOne.size(); ++j){
+          		if(dfsOne[j] -> gateType == Wir && ((Wire*)dfsOne[j])->isCut())
+            		++count;
+          		else if(dfsOne[j] -> gateType != Wir && dfsOne[j] -> gateType != Output && dfsOne[j] -> gateType != Input)
+            		++count;
+        			}
+        		cout << count << endl;
+      			}
+      	for(int i=0; i < circuitTwo-> output.size(); ++i){
+        		dfsTwo.clear();
+        		DFSearch(circuitTwo -> output[i], dfsTwo);
+        		int count = 0;
+        		for(int j=0; j < dfsTwo.size(); ++j){
+          		if(dfsTwo[j] -> gateType == Wir && ((Wire*)dfsTwo[j])->isCut())
+            		++count;
+          		else if(dfsTwo[j] -> gateType != Wir && dfsTwo[j] -> gateType != Output && dfsTwo[j] -> gateType != Input)
+            		++count;
+        			}
+        		cout << count << endl;
+      			}
+    		}
 };
 #endif

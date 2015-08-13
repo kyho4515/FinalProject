@@ -62,13 +62,13 @@ public:
   virtual void operate() = 0;
   virtual void constructSat(SatSolver& s,Var&) = 0;
   void setVar(Var& v){var = v;}
-  Var& getVar(){return var;}
+  Var getVar() const {return var;}
 };
 
 class InputGate:public Gate{
   public:
 	bool repeat;    
-	InputGate(string n, int a): Gate(n,a,Input, true){included = false;total_input.push_back(this);}
+	InputGate(string n, int a): Gate(n,a,Input, true){included = false;total_input.push_back(this);gateLevel=0;}
     void operate(){}
     void constructSat(SatSolver& s, Var&){}
 	
@@ -77,7 +77,7 @@ class InputGate:public Gate{
 
 class ConstGate:public Gate{
   public:
-    ConstGate(const string n, int a, bool p, int value): Gate(n, a, Const, p, value){}
+    ConstGate(const string n, int a, bool p, int value): Gate(n, a, Const, p, value){gateLevel=0;}
     void operate(){}
     void constructSat(SatSolver& s, Var& Const){}
   private:
@@ -119,7 +119,7 @@ class XorGate:public Gate{
 
 class Wire:public Gate{
   public:
-    Wire(string n, int a, int i): Gate(n,a,Wir){cut = false;circuitNum = i;included = false;potentialCut = false; cutLevel = INT_MAX;reachable = 0;}
+    Wire(string n, int a, int i): Gate(n,a,Wir){cut = false;circuitNum = i;included = false;potentialCut = false; cutLevel = INT_MAX;reachable = 0;mark=false;}
     void operate();
     bool isCut(){return cut;}
     void Cut(){cut = true;}
@@ -131,19 +131,24 @@ class Wire:public Gate{
     int cutLevel;
     bool potentialCut;
     bool reachable;
+	 vector<Wire*> backwire;
+	 bool mark;//將已經確認在FEC_pair中沒有任何上下關係的wire mark
   private:
     bool cut;
 };
 
 class BufGate:public Gate{
-  public:
-    BufGate(string n, int a, bool p): Gate(n,a,Buf,p){}
-    void operate();
-    void constructSat(SatSolver& s, Var& Const){
-      assert(input.size() == 1);
-      Gate* Input = (input[0] -> gateType == Wir && !(((Wire*)input[0]) -> isCut())) ? input[0] -> input[0] : input[0];
-      s.addAigCNF(getVar(), Input -> getVar(), !(Input -> phase), Const, false);
-    }
+	public:
+  		BufGate(string n, int a, bool p): Gate(n,a,Buf,p){}
+    	void operate();
+    	void constructSat(SatSolver& s, Var& Const){
+      	assert(input.size() == 1);
+			/*cout<<"output name:"<<output[0]->name<<endl;
+			cout<<output[0]->getVar()<<endl;
+			cout<<"input name:"<<input[0]->name<<endl;
+			cout<<input[0]->getVar()<<endl;*/
+      	s.addAigCNF(output[0]->getVar(), input[0] -> getVar(), !phase, Const, false);
+    		}
   private:
 };
 

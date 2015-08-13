@@ -17,23 +17,23 @@ class CirMgr{
   friend class Gate;
   friend CircuitCmp;
   private:
-	//variable
-    vector<Gate*> input;
-    vector<Gate*> output;
-    vector<Wire*> wire;
-    vector<Gate*> gate;
-    vector<Gate*> dfsList;
-    gmap inputMap;
-    gmap outputMap;
-    gmap wireMap;
-    gmap gateMap;
-    Gate* constTrueGate;
-    Gate* constFalseGate;
-	 ConstWire *const_wire;
-	//function
+//variable
+   vector<Gate*> input;//紀錄gateType是input的gate
+   vector<Gate*> output;//紀錄gateType是output的gate
+   vector<Wire*> wire;//紀錄gateType是Wir的gate
+   vector<Gate*> gate;//紀錄gateType是其他的gate
+   vector<Gate*> dfsList;
+   gmap inputMap;
+   gmap outputMap;
+   gmap wireMap;
+   gmap gateMap;
+   Gate* constTrueGate;//值為1的input
+   Gate* constFalseGate;//值為0的input
+	ConstWire *const_wire;//是constant的gate(1 or 0)
+//function
 	void resetTraversed();
   public:
-   CirMgr(const char* file, int num){ReadVerilog(file, num);/*onst_wire=new ConstWire(input,dfsList);*/}
+   CirMgr(const char* file, int num){ReadVerilog(file, num);}
    ~CirMgr(){
      for(int i=0; i < input.size(); ++i)
        delete input[i];
@@ -49,10 +49,7 @@ class CirMgr{
    bool ReadVerilog(string inputFile, int num);
    void DFSearch(Gate*);
    void WriteOutputFile(const char* );
-	 vector<vector<Gate*>* > Getdep_output();
-	 vector<vector<string>* >Getdep_input();	
-	 Gate* Getoutput(int);
-	 int GetoutputSize(); 
+	void FindConstWire();
 };
 
 #endif

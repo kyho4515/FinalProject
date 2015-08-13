@@ -85,6 +85,11 @@ class SatSolver
                 (_solver->modelValue(v)==l_False?0:-1)); }
       void printStats() const { const_cast<Solver*>(_solver)->printStats(); }
 
+		//my function
+		int assump_size(){return _assump.size();}
+		int clause_size(){return _solver->clauses_size();}
+		void pop_assump(){_assump.pop();}
+
    private : 
       Solver           *_solver;    // Pointer to a Minisat solver
       Var               _curVar;    // Variable currently

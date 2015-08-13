@@ -210,14 +210,14 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
     cout << "input numbers: "<< input.size() << endl;
     cout << "output numbers: " << output.size() << endl;
     cout << "wire numbers: " << wire.size() << endl << endl;
-	 bool repeat;
-	 bool full;
+	
 	//do DFS
     for(int i=0; i < output.size(); ++i){
       if(output[i] -> name != "\n"){
 			 DFSearch(output[i]);
 		 }
 	   }
+	
 // 7/14 //
 	//填入vector<Gate*> final_output
 	for(int i=dfsList.size();i>0;i--){
@@ -229,7 +229,7 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
 			}
 			dfsList[i-1]->final_output=ori.GetWholeOutput();
 		}
-	}
+	}	
 // 7/14 //
 // 7/23 //
 	resetTraversed();
@@ -239,19 +239,22 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
 
 
 void CirMgr::DFSearch(Gate* source){
-  int max = 0;
-  for(int i = 0; i < source -> input.size(); ++i){
-    if(source -> input[i] -> gateType == Input)
-      source -> input[i] -> gateLevel = 0;
-    if(!(source -> input[i] -> traversed)){
-      source -> input[i] -> traversed = true;
-      DFSearch(source -> input[i]);
-    	   }
-    if(max < source -> input[i] -> gateLevel)
-      max = source -> input[i] -> gateLevel;
-      }
-  if(source -> gateType != Input)
-    source -> gateLevel = max + 1;
+	int max = 0;
+   for(int i = 0; i < source -> input.size(); ++i){
+    	if(!(source -> input[i] -> traversed)){
+      	source -> input[i] -> traversed = true;
+      	DFSearch(source -> input[i]);
+    	   	}
+    	if(max < source -> input[i] -> gateLevel)
+      	max = source -> input[i] -> gateLevel;
+	}
+	if(source->gateType==Input || source->gateType==Const)
+		assert(source->gateLevel==0);
+   if(source -> gateType != Input && source -> gateType != Const)
+   	source -> gateLevel = max + 1;
+	if(source -> gateType == Wir)
+		assert(source -> gateLevel%2==0);
+	
 // 7/14 //
 	//填入vector<Gate*> total_input
 	if(source->gateType!=Input && source->gateType!=Const){
@@ -392,12 +395,7 @@ void CirMgr::WriteOutputFile(const char* name){
 	fout<<"endmodule"<<endl;
 }
 
-
-
-Gate* CirMgr::Getoutput(int n){
-	return output[n];
+void CirMgr::FindConstWire(){
+	assert(output.size()!=0);
+	const_wire=new ConstWire(output);
 }
-
- int CirMgr::GetoutputSize(){
-	return output.size();
-} 
