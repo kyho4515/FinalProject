@@ -19,6 +19,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include <queue>
 #include "sat/sat.h"
 class CirMgr;
 using namespace std;
@@ -119,7 +120,7 @@ class XorGate:public Gate{
 
 class Wire:public Gate{
   public:
-    Wire(string n, int a, int i): Gate(n,a,Wir){cut = false;circuitNum = i;included = false;potentialCut = false; cutLevel = INT_MAX;reachable = 0;mark=false;}
+    Wire(string n, int a, int i): Gate(n,a,Wir){cut = false;circuitNum = i;included = false;potentialCut = true; cutLevel = INT_MAX;reachable = 0;mark=false;}
     void operate();
     bool isCut(){return cut;}
     void Cut(){cut = true;}
@@ -143,10 +144,8 @@ class BufGate:public Gate{
     	void operate();
     	void constructSat(SatSolver& s, Var& Const){
       	assert(input.size() == 1);
-			/*cout<<"output name:"<<output[0]->name<<endl;
-			cout<<output[0]->getVar()<<endl;
-			cout<<"input name:"<<input[0]->name<<endl;
-			cout<<input[0]->getVar()<<endl;*/
+			/*cout<<output[0]->getVar()<<endl<<output[0]->name<<endl;
+			cout<<input[0]->getVar()<<endl<<input[0]->name<<endl;*/
       	s.addAigCNF(output[0]->getVar(), input[0] -> getVar(), !phase, Const, false);
     		}
   private:

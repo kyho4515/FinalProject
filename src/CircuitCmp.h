@@ -30,26 +30,27 @@ class CircuitCmp{
     vector<Var> outputXor;
     SatSolver solver;
     bool equivalence;
-    vector<int> CheckOutputNum; // store the output that should be check
+    vector<vector<int>*> CheckOutputNum; // store the output that should be check
 	 PotentialPair *Ppair;
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
       if(one -> input.size() == two -> input.size() && one -> gateType == two -> gateType){
-        for(int i=0; i < one -> input.size(); ++i){
-          bool flag = false;
-          for(int j=0; j < two -> input.size(); ++j){
-            if(one -> input[i] -> name == two -> input[j] -> name){
-              flag = true;
-              break;
-            }
-          }
-          if(!flag) return false;
-        }
-        return true;
-      }
+        	for(int i=0; i < one -> input.size(); ++i){
+          	bool flag = false;
+          	for(int j=0; j < two -> input.size(); ++j){
+            	if(one -> input[i] -> name == two -> input[j] -> name){
+              		flag = true;
+              		break;
+            				}
+          			}
+          	if(!flag) return false;
+        		}
+        	return true;
+      		}
       else return false;
-    }
+    	}
     bool Cut(Gate* x, Gate* y);
+	 bool Cut(int, Wire*,bool=false);
     bool CheckGoodCut(Gate* x, Gate* y);
     void CountInput(Gate* source, vector<Gate*>&);
 	 bool CheckInputEqual2(Gate* x, Gate* y);
@@ -57,8 +58,13 @@ class CircuitCmp{
     void SimFEC(vector<Gate*>&, vector<Gate*>&);
     bool SimCheck(bool mode,vector<Gate*>& dfsListOne, vector<Gate*>& dfsListTwo);//check circuit equivalent or not
     void DFSearch(Gate* source, vector<Gate*>& dfsList);
-    void genProofModel(vector<Gate*>& dfslistOne, vector<Gate*>& dfslistTwo);
+    void genProofModel(bool , vector<Gate*>& , vector<Gate*>& ,int =-1);//if in the same circuit mode = true
     void SimFilter(int, vector<Gate*>&, vector<Gate*>&);
+	 void SimLeveling();
+	 void SimSATcheck(bool=false);
+	 static bool sortcompare(const Wire* l,const Wire* r){  //sort的判斷式
+			return l->gateLevel < r->gateLevel;		
+	   }
     bool CheckReachability();
     bool CheckReach(Gate* source);
     bool Check(){
@@ -74,7 +80,7 @@ class CircuitCmp{
           //cout << "still equivalent" << endl;
         if(SimCheck(1,dfsListOne, dfsListTwo)){
           solver.initialize();
-          genProofModel(dfsListOne, dfsListTwo);
+          genProofModel(true,dfsListOne, dfsListTwo);
           for(int i=0; i < outputXor.size(); ++i){
             solver.assumeProperty(outputXor[i], true);
           }
@@ -91,7 +97,7 @@ class CircuitCmp{
       }
       return true;
     }
-   bool proveSAT(Wire*, Wire*);
+   bool proveSAT(Gate*, Gate*);
 	bool Check(Wire* a, Wire* b){
       dfsListOne.clear();
       dfsListTwo.clear();
@@ -130,7 +136,7 @@ class CircuitCmp{
             if(circuitOne -> output[i] -> name == tmp[j]){
               DFSearch(circuitOne -> output[i], dfsListOne);
               DFSearch(circuitTwo -> output[i], dfsListTwo);
-              CheckOutputNum.push_back(i);
+              //CheckOutputNum.push_back(i);
               break;
             }
           }
@@ -139,7 +145,7 @@ class CircuitCmp{
         circuitTwo -> resetTraversed();
         if(SimCheck(1,dfsListOne, dfsListTwo)){
           solver.initialize();
-          genProofModel(dfsListOne, dfsListTwo);
+          genProofModel(true,dfsListOne, dfsListTwo);
           for(int i=0; i < outputXor.size(); ++i){
             solver.assumeProperty(outputXor[i], true);
           }
@@ -164,15 +170,24 @@ class CircuitCmp{
         return true;
       }
     }
+	void DFS(Gate*);
+	void resetTraversed(vector<Gate*>&);
+	void SimInitialize();//input和cut給值 
+	bool SimCheckLevel(Wire* ,Wire* );//確認兩條wire是否互不包含，互不包含回傳false
+	bool proveDontCareSim(Wire*);//in strash.cpp
+	bool proveDontCareSat(Wire*);//in strash.cpp
+	void upwardCut(vector<Wire*>*);//in shortcut.cpp
+	void findCutfromFECpair(vector<Wire*>*);//in shortcut.cpp
 	public:
 		CircuitCmp(const char* , const char* );
     	~CircuitCmp();  	
    	void Simulation();
     	void Strash();
-    	void Sat();
+    	void Sat(int=-1);
     	void Simulation(int l);
     	void WriteFile(const char* , const char* );
-     	bool CircuitEquiCheck();
+     	bool CircuitEquiCheck(bool=false);
+		void RebuiltDFSlist();
 
     	void CheckResult(){
       	vector<Gate*> dfsOne,dfsTwo;
@@ -201,5 +216,6 @@ class CircuitCmp{
         		cout << count << endl;
       			}
     		}
+		int FECsize(){return _FECpair.size();}
 };
 #endif

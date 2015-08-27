@@ -68,8 +68,8 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
                 check_semi = i;
                 check_semi_output=1;
                 break;
-             }
-         }
+           		}
+         	}
          if(check_semi_output==1)
              hold_name.erase(check_semi,hold_name.length()-1-check_semi+1);
          if (hold_name.length()>=2 && hold_name[0]==',') {
@@ -217,6 +217,7 @@ bool CirMgr::ReadVerilog(string inputFilePath, int num){
 			 DFSearch(output[i]);
 		 }
 	   }
+	
 	
 // 7/14 //
 	//填入vector<Gate*> final_output

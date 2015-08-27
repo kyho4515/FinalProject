@@ -204,6 +204,12 @@ public:
 
 	//my function
 	int clauses_size(){return clauses.size();}
+	void clauses_clean(){
+		int size=clauses.size();
+		for(int i=0;i<size;i++)
+			clauses.pop();
+		assert(clauses.size()==0);
+	}
 };
 
 

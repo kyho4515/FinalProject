@@ -5,11 +5,11 @@ VectorGateAdd VectorGateAdd::operator+(VectorGateAdd s){
 	VectorGateAdd ret;
 	vector<Gate*> tem,s1=list,s2=s.GetWholeOutput();
 	while(s1.size()!=0 || s2.size()!=0){		
-		if(s2.size()==0 || (s1.size()!=0 && s1.back()->name>s2.back()->name)){
+		if(s2.size()==0 || (s1.size()!=0 && s1.back()->idd>s2.back()->idd)){
 			tem.push_back(s1.back());
 			s1.pop_back();
 		}						
-		else if(s1.size()==0 || (s2.size()!=0 && s1.back()->name<s2.back()->name)){
+		else if(s1.size()==0 || (s2.size()!=0 && s1.back()->idd<s2.back()->idd)){
 			tem.push_back(s2.back());
 			s2.pop_back();
 		}

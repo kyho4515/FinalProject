@@ -50,6 +50,7 @@ class CirMgr{
    void DFSearch(Gate*);
    void WriteOutputFile(const char* );
 	void FindConstWire();
+	Gate* GetInput(int i){return input[i];}
 };
 
 #endif

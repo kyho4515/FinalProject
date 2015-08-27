@@ -1,3 +1,3 @@
-original size: 2607
-new size: 251
-total wire: 738
+original size: 8543
+new size: 1398
+total wire: 4215

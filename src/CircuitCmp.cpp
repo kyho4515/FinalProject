@@ -15,51 +15,41 @@ CircuitCmp::CircuitCmp(const char* file1, const char* file2){
 	/***read file***/
 	cout<<endl<<"read circuitone"<<endl<<endl;
    circuitOne = new CirMgr(file1, 1);
-	circuitOne->FindConstWire();
-	assert(0);
 	cout<<endl<<"read circuittwo"<<endl<<endl;
    circuitTwo = new CirMgr(file2, 2);
-	circuitTwo->FindConstWire();
-      	
 	CurGateLevel = 2;
    CurCutLevel = 0;
-	
-	/***find const wire***/
-	
-	
-	assert(0);
+	assert(dfsListOne.size()==0 && dfsListTwo.size()==0);
+	dfsListOne=circuitOne->dfsList;
+	dfsListTwo=circuitTwo->dfsList;
+	assert(&dfsListOne != &(circuitOne->dfsList));
 }
 
-bool CircuitCmp::CircuitEquiCheck(){
+bool CircuitCmp::CircuitEquiCheck(bool check){
 	/***check 電路是否相等***/
+	vector<int> uncheckedOutput_index;
    if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
 		equivalence = true;
-   else 
+   else{
 		equivalence = false;
+		return false;
+	}
 	/******/
-
-///用sat證明電路相等或不相等    	
-	CheckOutputNum.clear();
-	solver.initialize();
-   for(int i=0; i < circuitOne->output.size(); ++i)
-   	CheckOutputNum.push_back(i);
-   genProofModel(circuitOne -> dfsList, circuitTwo -> dfsList);        	
-	for(int i=0; i < outputXor.size(); ++i){
-      solver.assumeProperty(outputXor[i], true);
-        }
-	/***true gate 和 false gate 加入assumption***/
-   solver.assumeProperty(circuitOne -> constTrueGate -> getVar(), true);
-  	solver.assumeProperty(circuitOne -> constFalseGate -> getVar(), false);
-	/******/	
-   bool result = solver.assumpSolve();
-   assert((equivalence && !result) || (!equivalence && result));
-	return equivalence;
+///用sat證明電路相等或不相等   
+	int n=circuitOne->output.size();
+	for(int i=0;i<n;i++){
+		//cout<<n-i-1<<endl;
+		if(!proveSAT(circuitOne->output[i],circuitTwo->output[i])){
+			equivalence = false;
+			return false;
+		}
+	}
+	return true;
 }
 
 
 void CircuitCmp::Simulation(){
-   SimFEC(circuitOne -> dfsList, circuitTwo -> dfsList);
-   SimFilter(500, circuitOne -> dfsList, circuitTwo -> dfsList);
+   SimFEC(dfsListOne, dfsListTwo);
 }
 
 void CircuitCmp::Simulation(int l){
@@ -139,22 +129,21 @@ void CircuitCmp::CountInput(Gate* source, vector<Gate*>& list){
     		}
   	}
 }
-void CircuitCmp::DFSearch(Gate* source, vector<Gate*>& dfsList){
-  	for(int i = 0; i < source -> input.size(); ++i){
-    	if(!(source -> input[i] -> traversed)){
-      	if(source -> input[i] -> gateType == Wir && ((Wire*)(source -> input[i])) -> isCut()){
-        		source -> input[i] -> traversed = true;
-        		dfsList.push_back(source -> input[i]);
-      			}
-      	else {
-        		source -> input[i] -> traversed = true;
-        		DFSearch(source -> input[i], dfsList);
-      			}
-    		}
-  	}
-  	dfsList.push_back(source);
+void CircuitCmp::DFSearch(Gate* source, vector<Gate*>& List){
+	source->traversed=true;
+	if(source->gateType!=Wir || !(((Wire*)source)->isCut())){
+		for(int i=0;i<source->input.size();i++){
+			if(!(source->input[i]->traversed))
+				DFSearch(source->input[i],List);
+		}
+	}
+  	List.push_back(source);
 }
 
+void CircuitCmp::resetTraversed(vector<Gate*>& List){
+  for(int i=0; i < List.size(); ++i)
+    List[i] -> traversed = false;
+}
 
 CircuitCmp::~CircuitCmp(){
 	delete circuitOne;
@@ -170,4 +159,25 @@ void CircuitCmp::WriteFile(const char* file1, const char* file2){
    circuitTwo->WriteOutputFile(file2);
 }
 		
+void CircuitCmp::RebuiltDFSlist(){
+	int one=0,two=0;
+	dfsListOne.clear();
+	dfsListTwo.clear();
+	circuitOne->resetTraversed();
+	circuitTwo->resetTraversed();
+	for(int i=0;i<circuitOne->output.size();i++){
+		DFSearch(circuitOne->output[i],dfsListOne);
+		DFSearch(circuitTwo->output[i],dfsListTwo);
+	}
+	for(int i=0;i<dfsListOne.size();i++)
+		if(dfsListOne[i]->gateType==Wir && !(((Wire*)dfsListOne[i])->isCut()) && ((Wire*)dfsListOne[i])->potentialCut)
+			one++;
+	for(int i=0;i<dfsListTwo.size();i++)
+		if(dfsListTwo[i]->gateType==Wir && !(((Wire*)dfsListTwo[i])->isCut()) && ((Wire*)dfsListTwo[i])->potentialCut)
+			two++;
+	cout<<one<<":"<<two<<endl;
+	resetTraversed(dfsListOne);
+	resetTraversed(dfsListTwo);
+
+}
 

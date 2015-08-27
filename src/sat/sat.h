@@ -89,6 +89,7 @@ class SatSolver
 		int assump_size(){return _assump.size();}
 		int clause_size(){return _solver->clauses_size();}
 		void pop_assump(){_assump.pop();}
+		void clauses_clean(){_solver->clauses_clean();}
 
    private : 
       Solver           *_solver;    // Pointer to a Minisat solver

@@ -5,6 +5,7 @@
 #include <queue>
 #include <stack>
 #include <algorithm>
+#include <fstream>
 #include "Gate.h"
 #include "util.h"
 class ConstWire{
@@ -26,17 +27,20 @@ class ConstWire{
 		SatSolver solver;
 		Var T;
 		Var F;
+		fstream fout;
 
 		void Find();//挑出是const的wire
 		bool checkconstant(Wire*);
-		void DFS(Gate*);//do DFS
-		void resetTraversed();//reset traversed
+		void DFS(Gate*,vector<Gate*>&);//do DFS
+		void resetTraversed(vector<Gate*>&);//reset traversed
 		static bool sortcompare(const Wire* l,const Wire* r){  //sort的判斷式
 			return l->gateLevel < r->gateLevel;		
 		}
 		bool ProveBySimulate(Gate* source,int);
 		bool ProveBySAT(Gate* source,int);
 		void genProofModel();
+		void Categorize();
+		void Check();
 		
 };
 

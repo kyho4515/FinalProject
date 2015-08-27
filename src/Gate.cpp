@@ -41,15 +41,14 @@ void OrGate::operate(){
 
 void OrGate::constructSat(SatSolver& s, Var& Const){
 	assert(input.size()>1);
-	Var fanin1,fanin2;
-	fanin1=input[0]->getVar();
-	for(int i=1;i<input.size();i++){
+	Var fan=s.newVar();
+	s.addAigCNF(fan, input[0]->getVar(), true, input[1]->getVar(), true);
+	for(int i=2;i<input.size();i++){
 		Var tem=s.newVar();
-		fanin2=input[i]->getVar();
-		s.addAigCNF(tem, fanin1, true, fanin2, true);
-		fanin1=tem;
+		s.addAigCNF(tem, fan, false, input[i]->getVar(), true);
+		fan=tem;
 	}
-	s.addAigCNF(output[0]->getVar(), fanin1, phase, Const, false);
+	s.addAigCNF(output[0]->getVar(), fan, phase, Const, false);
 }
 
 void XorGate::operate(){
