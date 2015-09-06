@@ -144,8 +144,6 @@ class BufGate:public Gate{
     	void operate();
     	void constructSat(SatSolver& s, Var& Const){
       	assert(input.size() == 1);
-			/*cout<<output[0]->getVar()<<endl<<output[0]->name<<endl;
-			cout<<input[0]->getVar()<<endl<<input[0]->name<<endl;*/
       	s.addAigCNF(output[0]->getVar(), input[0] -> getVar(), !phase, Const, false);
     		}
   private:

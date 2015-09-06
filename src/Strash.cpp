@@ -59,7 +59,7 @@ bool CircuitCmp::Cut(Gate* x, Gate* y){
       circuitTwo->resetTraversed();
       assert(SimCheck(1,dfsListOne,dfsListTwo));
       solver.initialize();
-      genProofModel(1,dfsListOne,dfsListTwo);
+      genProofModel(dfsListOne,dfsListTwo);
       return false;
     }
   }
@@ -258,4 +258,19 @@ void CircuitCmp::Strash(){
   }
   if(SimCheck(1, dfslistOne,dfslistTwo)) cout << "still equivalent" << endl;
   else assert(0);
+}
+
+void CircuitCmp::cutSetClear(int begin,int end){
+	assert(end < cutSet.size());
+	for(int i=end;i>=begin;i--){
+		assert(cutSet.size()==CheckOutputNum.size());
+		for(int j=0;j<cutSet[i]->size();j++)
+			cutSet[i]->at(j)->CutReset();
+		delete cutSet[i];
+		delete CheckOutputNum[i];
+		vector<vector<Wire*>*>::iterator it=cutSet.begin()+i;
+		cutSet.erase(it);
+		vector<vector<int>*>::iterator he=CheckOutputNum.begin()+i;
+		CheckOutputNum.erase(he);
+	}
 }

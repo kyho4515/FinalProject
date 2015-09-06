@@ -21,17 +21,25 @@ class CircuitCmp{
 	//variable
     int CurCutLevel;
     int CurGateLevel;
+	 int output_size;
+	 int input_size;
+	 int maxcutSet_size;
     CirMgr* circuitOne;
     CirMgr* circuitTwo;
     vector<vector<Wire*>*> _FECpair;
     vector<vector<Wire*>*> cutSet;
+	 vector<int>cut_potentialCutFalseWire_index;//當cut成立時，儲存那時候的potentialCutFalseWire的長度
+	 vector<Wire*> potentialCutFalseWire;//儲存potentialCut 被設成false的wire
     vector<Gate*> dfsListOne;
     vector<Gate*> dfsListTwo;
     vector<Var> outputXor;
+	 vector<int> start_record;
+	 vector<int> *all_output_index;
     SatSolver solver;
     bool equivalence;
     vector<vector<int>*> CheckOutputNum; // store the output that should be check
 	 PotentialPair *Ppair;
+	 fstream fout;
 	//function
     bool HashKeyCmp(Gate* one, Gate* two){
       if(one -> input.size() == two -> input.size() && one -> gateType == two -> gateType){
@@ -55,13 +63,6 @@ class CircuitCmp{
     void CountInput(Gate* source, vector<Gate*>&);
 	 bool CheckInputEqual2(Gate* x, Gate* y);
 	 bool CheckInputEqual1(Gate* x, Gate* y);
-    void SimFEC(vector<Gate*>&, vector<Gate*>&);
-    bool SimCheck(bool mode,vector<Gate*>& dfsListOne, vector<Gate*>& dfsListTwo);//check circuit equivalent or not
-    void DFSearch(Gate* source, vector<Gate*>& dfsList);
-    void genProofModel(bool , vector<Gate*>& , vector<Gate*>& ,int =-1);//if in the same circuit mode = true
-    void SimFilter(int, vector<Gate*>&, vector<Gate*>&);
-	 void SimLeveling();
-	 void SimSATcheck(bool=false);
 	 static bool sortcompare(const Wire* l,const Wire* r){  //sort的判斷式
 			return l->gateLevel < r->gateLevel;		
 	   }
@@ -80,7 +81,7 @@ class CircuitCmp{
           //cout << "still equivalent" << endl;
         if(SimCheck(1,dfsListOne, dfsListTwo)){
           solver.initialize();
-          genProofModel(true,dfsListOne, dfsListTwo);
+          genProofModel(dfsListOne, dfsListTwo);
           for(int i=0; i < outputXor.size(); ++i){
             solver.assumeProperty(outputXor[i], true);
           }
@@ -97,7 +98,7 @@ class CircuitCmp{
       }
       return true;
     }
-   bool proveSAT(Gate*, Gate*);
+   
 	bool Check(Wire* a, Wire* b){
       dfsListOne.clear();
       dfsListTwo.clear();
@@ -145,7 +146,7 @@ class CircuitCmp{
         circuitTwo -> resetTraversed();
         if(SimCheck(1,dfsListOne, dfsListTwo)){
           solver.initialize();
-          genProofModel(true,dfsListOne, dfsListTwo);
+          genProofModel(dfsListOne, dfsListTwo);
           for(int i=0; i < outputXor.size(); ++i){
             solver.assumeProperty(outputXor[i], true);
           }
@@ -170,24 +171,46 @@ class CircuitCmp{
         return true;
       }
     }
+	//in sat.cpp
+	bool SATCheckOutput(vector<int>*,bool=false);//用sat確認所有output相等
+	void genProofModel(vector<Gate*>& , vector<Gate*>& ,int =-1);//if in the same circuit mode = true
+	bool proveSAT(Gate*, Gate*);
+	//in CircuitCmp.cpp
+	void DFSearch(Gate* source, vector<Gate*>& dfsList);
 	void DFS(Gate*);
+	void potentialCutReset(int);
 	void resetTraversed(vector<Gate*>&);
+	//in simulation.cpp
+	bool SimFEC(vector<Gate*>&, vector<Gate*>&);
+   bool SimCheck(bool mode,vector<Gate*>& dfsListOne, vector<Gate*>& dfsListTwo,int=1);//check circuit equivalent or not
 	void SimInitialize();//input和cut給值 
+	void SimFilter(int, vector<Gate*>&, vector<Gate*>&);
+	void SimLeveling();
+	void SimSATcheck(bool=false);
 	bool SimCheckLevel(Wire* ,Wire* );//確認兩條wire是否互不包含，互不包含回傳false
-	bool proveDontCareSim(Wire*);//in strash.cpp
-	bool proveDontCareSat(Wire*);//in strash.cpp
-	void upwardCut(vector<Wire*>*);//in shortcut.cpp
-	void findCutfromFECpair(vector<Wire*>*);//in shortcut.cpp
+	bool SimCheckOutput(vector<int>*,int=1);//用simulation確認所有output都相等
+	//in strash.cpp
+	bool proveDontCareSim(Wire*);
+	bool proveDontCareSat(Wire*);
+	void cutSetClear(int,int);//清除指定範圍內的cutSet
+	//in shortcut.cpp
+	void upwardCut(vector<Wire*>*);//如果找到的cut只連接到buf那就連上面的一起cut
+	void findCutfromFECpair(vector<Wire*>*);//從有兩個circuit的wire的FECpair找cut
+	void upwardSetFalse(Wire* );//如果確定有一個wire不能被cut且他只有連接到buf，那就連上面的buf一起設成不能被cut
+	void FindWrongCut();//找到錯誤的cutSet並移除
 	public:
 		CircuitCmp(const char* , const char* );
     	~CircuitCmp();  	
-   	void Simulation();
+   	bool Simulation();
     	void Strash();
     	void Sat(int=-1);
     	void Simulation(int l);
     	void WriteFile(const char* , const char* );
      	bool CircuitEquiCheck(bool=false);
 		void RebuiltDFSlist();
+		bool CheckOutputEqualSAT();
+		void CountScore();
+		void SetOutputPhase();
 
     	void CheckResult(){
       	vector<Gate*> dfsOne,dfsTwo;

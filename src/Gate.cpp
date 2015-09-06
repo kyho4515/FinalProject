@@ -23,7 +23,7 @@ void AndGate::constructSat(SatSolver& s, Var& Const){
 		s.addAigCNF(tem, fanin1, false, fanin2, false);
 		fanin1=tem;
 	}
-	s.addAigCNF(output[0]->getVar(), fanin1, !phase, Const, false);
+	s.addAigCNF(output[0]->getVar(), fanin1, !phase, fanin1, !phase);
 }
 
 void OrGate::operate(){
@@ -48,14 +48,14 @@ void OrGate::constructSat(SatSolver& s, Var& Const){
 		s.addAigCNF(tem, fan, false, input[i]->getVar(), true);
 		fan=tem;
 	}
-	s.addAigCNF(output[0]->getVar(), fan, phase, Const, false);
+	s.addAigCNF(output[0]->getVar(), fan, phase, fan, phase);
 }
 
 void XorGate::operate(){
   	int tmp = input[0] -> curSim;
   	int tmp2 = tmp;
   	for(int i=1; i < input.size(); ++i){
-    	tmp2 = (tmp & ~input[i] -> curSim) | (~tmp & input[i] -> curSim);
+    	tmp2 = (tmp & ~(input[i] -> curSim)) | ((~tmp) & input[i] -> curSim);
     	tmp = tmp2;
   	}
 
@@ -74,10 +74,11 @@ void XorGate::constructSat(SatSolver& s, Var& Const){
 		s.addXorCNF(tem, fanin1, false, fanin2, false);
 		fanin1=tem;
 	}
-	s.addAigCNF(output[0]->getVar(), fanin1, !phase, Const, false);	
+	s.addAigCNF(output[0]->getVar(), fanin1, !phase, fanin1, !phase);	
 }
 
 void BufGate::operate(){
+	assert(input.size()==1);
   	if(phase == false)
     	curSim = ~(input[0] -> curSim);
   	else 
@@ -85,11 +86,13 @@ void BufGate::operate(){
 }
 
 void Wire::operate(){
+	assert(input.size()==1);
   	if(!isCut())
     	curSim = input[0] -> curSim;
 }
 
 void OutputGate::operate(){
+	assert(input.size()==1);
   	curSim = input[0] -> curSim;
 }
 

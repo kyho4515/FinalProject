@@ -26,26 +26,28 @@ int main(const int argc, const char* argv[]) {
   cout << "Ending Strash..." << endl;
   */
 
-	if(circuit.CircuitEquiCheck())
+	if(circuit.CircuitEquiCheck()){
 		cout << "Equivalent" << endl;
+		circuit.SetOutputPhase();
+	}
  	else 
 		cout << "Non-equivalent" << endl;
-  	//assert(0);
+
 	while(true){
 		cout << "Starting Sim..." << endl;  
 		circuit.RebuiltDFSlist();		
-		circuit.Simulation();
-		if(circuit.FECsize()==0)
+		if(circuit.Simulation()){
+			cout << "Ending Simulation..." << endl<<endl;	
+			circuit.Sat(1);
+		}
+		else{
 			break;
-  		cout << "Ending Simulation..." << endl<<endl;		
-  		circuit.Sat(1);
-		//assert(0);
+		}
 	}
-  
-  /*for(int i=0; i < 1; ++i){
-    circuit.Simulation(1);
-    circuit.Sat();
-  }*/
+	cout<<"***************"<<endl;
+	if(!circuit.CheckOutputEqualSAT())
+		assert(0);
+  	circuit.CountScore();
 	/*cout<<"SAT end..."<<endl;
   circuit.CheckResult();
   circuit.WriteFile(argv[3], argv[4]);*/

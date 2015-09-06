@@ -9,11 +9,11 @@ all: ../bin/equivalenceCut
 dbg: ../bin/equivalenceCut_dbg
 	@echo -n ""
 
-../bin/equivalenceCut: main.o CirMgr.o Gate.o Simulation.o util.o CircuitCmp.o Strash.o Sat.o ../lib/tm_usage.o ../lib/libsat.a DepList.o ConstWire.o pair.o shortcut.o
+../bin/equivalenceCut: main.o CirMgr.o Gate.o Simulation.o util.o CircuitCmp.o Strash.o Sat.o ../lib/tm_usage.o ../lib/libsat.a  ConstWire.o pair.o shortcut.o
 	$(CXX) $^ -o $@
 
 
-../bin/equivalenceCut_dbg: main_dbg.o CirMgr_dbg.o Gate_dbg.o util_dbg.o Simulation_dbg.o CircuitCmp_dbg.o Strash_dbg.o Sat_dbg.o ../lib/tm_usage.o ../lib/libsat.a DepList_dbg.o ConstWire_dbg.o pair_dbg.o shortcut_dbg.o
+../bin/equivalenceCut_dbg: main_dbg.o CirMgr_dbg.o Gate_dbg.o util_dbg.o Simulation_dbg.o CircuitCmp_dbg.o Strash_dbg.o Sat_dbg.o ../lib/tm_usage.o ../lib/libsat.a  ConstWire_dbg.o pair_dbg.o shortcut_dbg.o
 	$(CXX) $^ -o $@
 
 main.o: main.cpp Gate.h CirMgr.h CircuitCmp.h
@@ -41,9 +41,6 @@ shortcut.o: shortcut.cpp CircuitCmp.h
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 Sat.o: Sat.cpp CircuitCmp.h
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-DepList.o: DepList.cpp DepList.h Gate.h
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 ConstWire.o: ConstWire.cpp ConstWire.h Gate.h util.h
@@ -77,9 +74,6 @@ shortcut_dbg.o: shortcut.cpp CircuitCmp.h
 	$(CXX) $(DBGFLAGS) -c $< -o $@
 
 Sat_dbg.o: Sat.cpp CircuitCmp.h
-	$(CXX) $(DBGFLAGS) -c $< -o $@
-
-DepList_dbg.o: DepList.cpp DepList.h Gate.h
 	$(CXX) $(DBGFLAGS) -c $< -o $@
 
 ConstWire_dbg.o: ConstWire.cpp ConstWire.h Gate.h util.h

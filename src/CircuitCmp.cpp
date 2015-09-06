@@ -20,36 +20,36 @@ CircuitCmp::CircuitCmp(const char* file1, const char* file2){
 	CurGateLevel = 2;
    CurCutLevel = 0;
 	assert(dfsListOne.size()==0 && dfsListTwo.size()==0);
+	output_size=circuitOne->output.size();
+	input_size=circuitOne->input.size();
+	all_output_index=new vector<int>;
+	for(int i=0;i<output_size;i++)
+		all_output_index->push_back(i);
 	dfsListOne=circuitOne->dfsList;
 	dfsListTwo=circuitTwo->dfsList;
 	assert(&dfsListOne != &(circuitOne->dfsList));
+	fout.open("error.txt",ios::out);
+	maxcutSet_size=0;
 }
 
 bool CircuitCmp::CircuitEquiCheck(bool check){
 	/***check 電路是否相等***/
-	vector<int> uncheckedOutput_index;
-   if(SimCheck(1, circuitOne -> dfsList, circuitTwo -> dfsList)) 
-		equivalence = true;
-   else{
-		equivalence = false;
-		return false;
-	}
-	/******/
-///用sat證明電路相等或不相等   
-	int n=circuitOne->output.size();
-	for(int i=0;i<n;i++){
-		//cout<<n-i-1<<endl;
-		if(!proveSAT(circuitOne->output[i],circuitTwo->output[i])){
+	/*for(int i=0;i<3;i++){
+   	if(!SimCheck(true, circuitOne -> dfsList, circuitTwo -> dfsList)){
 			equivalence = false;
 			return false;
 		}
-	}
-	return true;
+	}*/
+	equivalence = true;
+	/******/
+///用sat證明電路相等或不相等   
+	equivalence=CheckOutputEqualSAT();
+	return equivalence;
 }
 
 
-void CircuitCmp::Simulation(){
-   SimFEC(dfsListOne, dfsListTwo);
+bool CircuitCmp::Simulation(){
+   return SimFEC(dfsListOne, dfsListTwo);
 }
 
 void CircuitCmp::Simulation(int l){
@@ -178,6 +178,109 @@ void CircuitCmp::RebuiltDFSlist(){
 	cout<<one<<":"<<two<<endl;
 	resetTraversed(dfsListOne);
 	resetTraversed(dfsListTwo);
+}
+bool CircuitCmp::CheckOutputEqualSAT(){
 
+	bool result=SimCheckOutput(all_output_index);
+	if(result)
+		cout<<"euqivalence"<<endl;
+	else{
+		cout<<"non-euqivalence"<<endl;
+		assert(0);
+	}
+	//if(equivalence && result){
+		for(int i=0;i<circuitOne->output.size();i++){
+			if(!proveSAT(circuitOne->output[i],circuitTwo->output[i])){
+				return false;
+			}
+		}
+		return true;
+/*	}
+	else
+		return false;
+*/	
 }
 
+struct intsort{
+	bool operator()(const int i1,const int i2){
+		return i1>i2;
+	}
+
+};
+void CircuitCmp::CountScore(){
+	vector<int>score;
+	int tmp;
+	vector<Gate*> store;
+	cout<<cutSet.size()<<endl;
+	for(int i=0;i<cutSet.size();i++){
+		for(int j=0;j<cutSet[i]->size();j++){
+			cout<<cutSet[i]->at(j)->name<<endl;
+			DFSearch(cutSet[i]->at(j)->input[0],store);
+			tmp=0;			
+			for(int k=0;k<store.size();k++){
+				if(store[k]->gateType!=Input  && store[k]->gateType!=Wir)
+					tmp++;
+			}
+			tmp++;
+			if(tmp==1){
+				cout<<"tmp=1"<<endl;
+				assert(0);
+			}
+			score.push_back(tmp);
+			store.clear();
+		}
+	}
+	for(int i=0;i<circuitOne->output.size();i++){
+		DFSearch(circuitOne->output[i]->input[0],store);
+		resetTraversed(store);
+		tmp=0;
+		for(int j=0;j<store.size();j++){
+			if(store[j]->gateType!=Input  && store[j]->gateType!=Wir)
+				tmp++;		
+		}
+		score.push_back(tmp);
+		store.clear();
+		DFSearch(circuitTwo->output[i]->input[0],store);
+		resetTraversed(store);
+		tmp=0;
+		for(int j=0;j<store.size();j++){
+			if(store[j]->gateType!=Input && store[j]->gateType!=Wir)
+				tmp++;		
+		}
+		score.push_back(tmp);
+		store.clear();
+	}
+	intsort g;
+	sort(score.begin(),score.end(),g);
+	for(int i=0;i<score.size()-1;i++)
+		cout<<score[i]<<",";
+	cout<<score[score.size()-1]<<endl;
+}
+
+
+void CircuitCmp::potentialCutReset(int index){
+	for(int i=potentialCutFalseWire.size()-1;i>=index;i--){
+		assert(potentialCutFalseWire[i]->gateType==Wir);
+		potentialCutFalseWire[i]->potentialCut=true;
+		potentialCutFalseWire.pop_back();
+	}
+}
+
+void CircuitCmp::SetOutputPhase(){
+	for(int i=0;i<output_size;i++)
+		if(circuitOne->output[i]->curSim==circuitTwo->output[i]->curSim){
+			circuitOne->output[i]->phase=true;
+			circuitTwo->output[i]->phase=true;
+		}	
+		else if(circuitOne->output[i]->curSim==~(circuitTwo->output[i]->curSim)){
+			circuitOne->output[i]->phase=true;
+			circuitTwo->output[i]->phase=false;
+		}
+		else{
+			cout<<"not equivalent"<<endl;
+			assert(0);
+		}
+
+
+
+}
